@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.orbs-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+}
+
+.orb-1 {
+    top: 15%;
+    right: -5%;
+    width: 350px;
+    height: 350px;
+    background: rgba(200, 16, 46, 0.03);
+    animation: driftA 18s ease-in-out infinite;
+}
+
+.orb-2 {
+    top: 40%;
+    left: -8%;
+    width: 300px;
+    height: 300px;
+    background: rgba(0, 132, 61, 0.03);
+    animation: driftB 22s ease-in-out infinite;
+}
+
+.orb-3 {
+    top: 65%;
+    right: 10%;
+    width: 280px;
+    height: 280px;
+    background: rgba(74, 144, 217, 0.03);
+    animation: driftC 16s ease-in-out infinite;
+}
+
+.orb-4 {
+    top: 85%;
+    left: 20%;
+    width: 220px;
+    height: 220px;
+    background: rgba(212, 175, 55, 0.03);
+    animation: driftD 20s ease-in-out infinite;
+}
+
+.orb-5 {
+    top: 30%;
+    left: 50%;
+    width: 400px;
+    height: 400px;
+    background: rgba(200, 16, 46, 0.02);
+    animation: driftB 25s ease-in-out infinite;
+}
+
+.orb-6 {
+    top: 55%;
+    right: 30%;
+    width: 180px;
+    height: 180px;
+    background: rgba(0, 132, 61, 0.025);
+    animation: driftA 14s ease-in-out infinite;
+}
+
+@keyframes driftA {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(80px, 40px) scale(1.08); }
+    50% { transform: translate(-30px, 80px) scale(0.95); }
+    75% { transform: translate(-60px, -20px) scale(1.05); }
+}
+
+@keyframes driftB {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    30% { transform: translate(-70px, -50px) scale(1.1); }
+    60% { transform: translate(50px, 30px) scale(0.92); }
+}
+
+@keyframes driftC {
+    0%, 100% { transform: translate(0, 0) scale(0.95); }
+    40% { transform: translate(40px, -60px) scale(1.12); }
+    70% { transform: translate(-50px, 40px) scale(1); }
+}
+
+@keyframes driftD {
+    0%, 100% { transform: translate(0, 0) scale(1.05); }
+    50% { transform: translate(-80px, 50px) scale(0.9); }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0d1829;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #243352;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #2a3a5c;
+}
