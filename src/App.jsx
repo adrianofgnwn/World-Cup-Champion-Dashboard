@@ -25,7 +25,7 @@ export default function App() {
 
             <Header tab={tab} setTab={setTab} />
 
-            <div style={{ maxWidth: 960, margin: "0 auto", padding: "24px 16px 48px", position: "relative", zIndex: 1 }}>
+            <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 24px 48px", position: "relative", zIndex: 1 }}>
                 {tab === "Overview" && <Overview />}
                 {tab === "Rankings" && <Rankings />}
                 {tab === "Champion DNA" && <ChampionDNA />}

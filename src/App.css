@@ -26,8 +26,10 @@
     right: -5%;
     width: 350px;
     height: 350px;
-    background: rgba(200, 16, 46, 0.03);
+    background: rgba(200, 16, 46, 0.2);
     animation: driftA 18s ease-in-out infinite;
+    filter: blur(80px);
+    mix-blend-mode: screen;
 }
 
 .orb-2 {
@@ -35,8 +37,10 @@
     left: -8%;
     width: 300px;
     height: 300px;
-    background: rgba(0, 132, 61, 0.03);
+    background: rgba(0, 132, 61, 0.3);
     animation: driftB 22s ease-in-out infinite;
+    filter: blur(80px);
+    mix-blend-mode: screen;
 }
 
 .orb-3 {
@@ -44,8 +48,10 @@
     right: 10%;
     width: 280px;
     height: 280px;
-    background: rgba(74, 144, 217, 0.03);
+    background: rgba(74, 144, 217, 0.3);
     animation: driftC 16s ease-in-out infinite;
+    filter: blur(80px);
+    mix-blend-mode: screen;
 }
 
 .orb-4 {
@@ -53,17 +59,21 @@
     left: 20%;
     width: 220px;
     height: 220px;
-    background: rgba(212, 175, 55, 0.03);
+    background: rgba(212, 175, 55, 0.3);
     animation: driftD 20s ease-in-out infinite;
+    filter: blur(80px);
+    mix-blend-mode: screen;
 }
 
 .orb-5 {
     top: 30%;
-    left: 50%;
+    left: 20%;
     width: 400px;
     height: 400px;
-    background: rgba(200, 16, 46, 0.02);
+    background: rgba(200, 16, 46, 0.1);
     animation: driftB 25s ease-in-out infinite;
+    filter: blur(80px);
+    mix-blend-mode: screen;
 }
 
 .orb-6 {
@@ -71,8 +81,10 @@
     right: 30%;
     width: 180px;
     height: 180px;
-    background: rgba(0, 132, 61, 0.025);
+    background: rgba(0, 132, 61, 0.2);
     animation: driftA 14s ease-in-out infinite;
+    filter: blur(80px);
+    mix-blend-mode: screen;
 }
 
 @keyframes driftA {
