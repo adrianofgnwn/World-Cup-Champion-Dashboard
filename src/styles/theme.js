@@ -1,0 +1,10 @@
+export const NAVY = "#0d1829";
+export const NAVY_MID = "#1a2744";
+export const NAVY_LIGHT = "#243352";
+export const RED = "#c8102e";
+export const GREEN = "#00843d";
+export const WHITE = "#ffffff";
+export const OFF_WHITE = "#e2e5eb";
+export const GRAY = "#8892a4";
+export const CARD_BG = "#142036";
+export const CARD_BORDER = "#1e3050";
