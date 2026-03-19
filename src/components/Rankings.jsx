@@ -28,7 +28,7 @@ export default function Rankings() {
         <>
             <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: WHITE, marginBottom: 4 }}>2026 CONTENDER RANKINGS</h2>
             <p style={{ color: GRAY, fontSize: 13, marginBottom: 20 }}>
-                All 48 qualified teams ranked by FIFA Elo rating. Click a team to compare their profile against the World Cup champion DNA.
+                All 48 qualified teams ranked by FIFA Elo rating. Team profiles built from 16 data sources covering friendlies, qualifiers, Nations League, and continental tournaments (2023–2026). Click a team to compare their profile against the World Cup champion DNA.
             </p>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
