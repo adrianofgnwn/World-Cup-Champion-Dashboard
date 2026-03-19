@@ -4,7 +4,6 @@ import Header from "./components/Header";
 import Overview from "./components/Overview";
 import Rankings from "./components/Rankings";
 import ChampionDNA from "./components/ChampionDNA";
-import XGAnalysis from "./components/XGAnalysis";
 import "./App.css";
 
 export default function App() {
@@ -29,7 +28,6 @@ export default function App() {
                 {tab === "Overview" && <Overview />}
                 {tab === "Rankings" && <Rankings />}
                 {tab === "Champion DNA" && <ChampionDNA />}
-                {tab === "xG Analysis" && <XGAnalysis />}
             </div>
 
             <div style={{ textAlign: "center", padding: "16px 16px 28px", color: GRAY, fontSize: 11, borderTop: `1px solid ${CARD_BORDER}`, position: "relative", zIndex: 1 }}>
