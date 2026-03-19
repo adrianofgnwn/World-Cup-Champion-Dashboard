@@ -5,6 +5,7 @@ import Overview from "./components/Overview";
 import Rankings from "./components/Rankings";
 import ChampionDNA from "./components/ChampionDNA";
 import Simulator from "./components/Simulator";
+import Bracket from "./components/Bracket";
 import MatchPredictor from "./components/MatchPredictor";
 import "./App.css";
 
@@ -31,6 +32,7 @@ export default function App() {
                 {tab === "Rankings" && <Rankings />}
                 {tab === "Champion DNA" && <ChampionDNA />}
                 {tab === "Simulator" && <Simulator />}
+                {tab === "Bracket" && <Bracket />}
                 {tab === "Match Predictor" && <MatchPredictor />}
             </div>
 
