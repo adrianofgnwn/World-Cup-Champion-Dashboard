@@ -4,9 +4,9 @@ import Header from "./components/Header";
 import Overview from "./components/Overview";
 import Rankings from "./components/Rankings";
 import ChampionDNA from "./components/ChampionDNA";
-import Simulator from "./components/Simulator";
-import Bracket from "./components/Bracket";
 import MatchPredictor from "./components/MatchPredictor";
+import WinOdds from "./components/WinOdds";
+import Simulator from "./components/Simulator";
 import "./App.css";
 
 export default function App() {
@@ -31,9 +31,9 @@ export default function App() {
                 {tab === "Overview" && <Overview />}
                 {tab === "Rankings" && <Rankings />}
                 {tab === "Champion DNA" && <ChampionDNA />}
-                {tab === "Simulator" && <Simulator />}
-                {tab === "Bracket" && <Bracket />}
                 {tab === "Match Predictor" && <MatchPredictor />}
+                {tab === "Win Odds" && <WinOdds />}
+                {tab === "Simulator" && <Simulator />}
             </div>
 
             <div style={{ textAlign: "center", padding: "16px 16px 28px", color: GRAY, fontSize: 11, borderTop: `1px solid ${CARD_BORDER}`, position: "relative", zIndex: 1 }}>
