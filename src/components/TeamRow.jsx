@@ -1,7 +1,20 @@
 import { RED, GREEN, WHITE, GRAY, CARD_BG, CARD_BORDER, NAVY_LIGHT } from "../styles/theme";
 
+// Elo range for progress bar scaling (min qualified team to max)
+const ELO_MIN = 1350;
+const ELO_MAX = 1900;
+
+function eloColor(elo) {
+    if (elo >= 1750) return RED;     // Elite tier
+    if (elo >= 1600) return GREEN;   // Contender tier
+    return GRAY;                      // Outsider tier
+}
+
 export default function TeamRow({ team, selected, onClick }) {
     const isTop3 = team.rank <= 3;
+    const pct = Math.max(0, Math.min(100, ((team.elo - ELO_MIN) / (ELO_MAX - ELO_MIN)) * 100));
+    const color = eloColor(team.elo);
+
     return (
         <button onClick={onClick} style={{
             display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 12,
@@ -14,16 +27,16 @@ export default function TeamRow({ team, selected, onClick }) {
             <span style={{ fontSize: 28 }}>{team.flag}</span>
             <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: WHITE }}>{team.name}</div>
-                <div style={{ fontSize: 11, color: GRAY }}>{team.matches} matches · {team.conf}</div>
+                <div style={{ fontSize: 11, color: GRAY }}>Group {team.group} · {team.conf}</div>
             </div>
             <div style={{ position: "relative", width: 140, height: 10, background: NAVY_LIGHT, borderRadius: 5, overflow: "hidden" }}>
                 <div style={{
-                    width: `${team.score}%`, height: "100%", borderRadius: 5,
-                    background: team.score >= 80 ? RED : team.score >= 60 ? GREEN : GRAY,
+                    width: `${pct}%`, height: "100%", borderRadius: 5,
+                    background: color,
                     transition: "width 0.5s ease",
                 }} />
             </div>
-            <span style={{ fontSize: 22, fontWeight: 900, color: team.score >= 80 ? RED : team.score >= 60 ? GREEN : GRAY, minWidth: 36, textAlign: "right", fontFamily: "'Barlow Condensed', sans-serif" }}>{team.score}</span>
+            <span style={{ fontSize: 20, fontWeight: 900, color: color, minWidth: 48, textAlign: "right", fontFamily: "'Barlow Condensed', sans-serif" }}>{team.elo}</span>
         </button>
     );
 }
