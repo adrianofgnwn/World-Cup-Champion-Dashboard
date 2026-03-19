@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NAVY, GRAY, CARD_BORDER } from "./styles/theme.js";
 import Header from "./components/ui/Header.jsx";
+import CountdownBar from "./components/ui/CountdownBar.jsx";
 import Overview from "./components/pages/Overview.jsx";
 import Rankings from "./components/pages/Rankings.jsx";
 import ChampionDNA from "./components/pages/ChampionDNA.jsx";
@@ -14,6 +15,8 @@ export default function App() {
 
     return (
         <div className="app" style={{ fontFamily: "'Barlow', sans-serif", background: NAVY, minHeight: "100vh", color: "#e2e5eb", position: "relative", overflow: "hidden" }}>
+
+            <CountdownBar />
 
             {/* Global floating orbs */}
             <div className="orbs-container">
