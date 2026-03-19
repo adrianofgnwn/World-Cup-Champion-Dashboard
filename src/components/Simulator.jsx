@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NAVY, GRAY, CARD_BORDER } from "./styles/theme";
+import { NAVY, GRAY, CARD_BORDER } from "../styles/theme";
 import Header from "./components/Header";
 import Overview from "./components/Overview";
 import Rankings from "./components/Rankings";
