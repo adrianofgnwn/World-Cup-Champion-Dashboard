@@ -37,7 +37,7 @@ export default function App() {
             </div>
 
             <div style={{ textAlign: "center", padding: "16px 16px 28px", color: GRAY, fontSize: 11, borderTop: `1px solid ${CARD_BORDER}`, position: "relative", zIndex: 1 }}>
-                🏆 Data: FIFA World Cup 1974–2022 + 16 recent international sources (2023–2026) · Built as a BSc Computer Science portfolio project
+                ⚽ Historical data: FIFA World Cup 1974–2022 · Current form: 16 international sources (2023–2026) · BSc Computer Science portfolio project
             </div>
         </div>
     );

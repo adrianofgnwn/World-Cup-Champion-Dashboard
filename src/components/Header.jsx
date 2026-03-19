@@ -11,10 +11,10 @@ export default function Header({ tab, setTab }) {
                     FIFA World Cup 2026 · ML Analysis
                 </div>
                 <h1 style={{ fontSize: "clamp(22px, 4vw, 36px)", fontWeight: 900, margin: "0 0 6px", color: WHITE, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 1 }}>
-                    WHAT MAKES A WORLD CUP CHAMPION?
+                    FIFA WORLD CUP 2026 PREDICTOR
                 </h1>
                 <p style={{ color: GRAY, fontSize: 12, margin: 0 }}>
-                    Analyzing 86 performances across 13 World Cups · Scoring 25 contenders from 16 data sources
+                    13 World Cups analyzed · 48 teams profiled · 10,000 tournaments simulated · Powered by Elo ratings
                 </p>
             </div>
 
