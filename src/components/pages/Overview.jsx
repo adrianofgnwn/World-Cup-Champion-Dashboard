@@ -1,6 +1,6 @@
-import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../styles/theme";
-import { TEAMS } from "../data/teams";
-import StatCard from "./StatCard";
+import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme.js";
+import { TEAMS } from "../../data/teams.js";
+import StatCard from "../ui/StatCard.jsx";
 
 const GOLD = "#d4af37";
 const BLUE = "#4a90d9";

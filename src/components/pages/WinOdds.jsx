@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../styles/theme";
-import { TEAMS } from "../data/teams";
+import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme.js";
+import { TEAMS } from "../../data/teams.js";
 
 const STAGES = ["R32", "R16", "QF", "SF", "Final", "Winner"];
 const STAGE_KEYS = ["r32", "r16", "qf", "sf", "final", "winner"];

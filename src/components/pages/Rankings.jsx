@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from "recharts";
-import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../styles/theme";
-import { CHAMPION, TEAMS } from "../data/teams";
-import TeamRow from "./TeamRow";
+import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme.js";
+import { CHAMPION, TEAMS } from "../../data/teams.js";
+import TeamRow from "../ui/TeamRow.jsx";
 
 export default function Rankings() {
     const [selectedTeam, setSelectedTeam] = useState("Spain");

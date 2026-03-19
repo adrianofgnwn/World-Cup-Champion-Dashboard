@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { NAVY, GRAY, CARD_BORDER } from "./styles/theme";
-import Header from "./components/Header";
-import Overview from "./components/Overview";
-import Rankings from "./components/Rankings";
-import ChampionDNA from "./components/ChampionDNA";
-import MatchPredictor from "./components/MatchPredictor";
-import WinOdds from "./components/WinOdds";
-import Simulator from "./components/Simulator";
-import "./App.css";
+import { NAVY, GRAY, CARD_BORDER } from "./styles/theme.js";
+import Header from "./components/ui/Header.jsx";
+import Overview from "./components/pages/Overview.jsx";
+import Rankings from "./components/pages/Rankings.jsx";
+import ChampionDNA from "./components/pages/ChampionDNA.jsx";
+import MatchPredictor from "./components/pages/MatchPredictor.jsx";
+import WinOdds from "./components/pages/WinOdds.jsx";
+import Simulator from "./components/pages/Simulator.jsx";
+import "./styles/App.css";
 
 export default function App() {
     const [tab, setTab] = useState("Overview");

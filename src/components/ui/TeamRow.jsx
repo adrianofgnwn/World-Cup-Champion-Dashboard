@@ -1,4 +1,4 @@
-import { RED, GREEN, WHITE, GRAY, CARD_BG, CARD_BORDER, NAVY_LIGHT } from "../styles/theme";
+import { RED, GREEN, WHITE, GRAY, CARD_BG, CARD_BORDER, NAVY_LIGHT } from "../../styles/theme.js";
 
 // Elo range for progress bar scaling (min qualified team to max)
 const ELO_MIN = 1350;

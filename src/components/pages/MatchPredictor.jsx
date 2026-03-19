@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
-import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../styles/theme";
-import { TEAMS, predictMatch } from "../data/teams";
+import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme.js";
+import { TEAMS, predictMatch } from "../../data/teams.js";
 
 const BLUE = "#4a90d9";
 const GOLD = "#d4af37";

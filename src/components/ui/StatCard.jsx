@@ -1,4 +1,4 @@
-import { RED, WHITE, GRAY, CARD_BG, CARD_BORDER } from "../styles/theme";
+import { RED, WHITE, GRAY, CARD_BG, CARD_BORDER } from "../../styles/theme.js";
 
 export default function StatCard({ label, value, sub, accent = RED }) {
     return (

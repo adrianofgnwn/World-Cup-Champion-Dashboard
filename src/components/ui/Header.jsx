@@ -1,4 +1,4 @@
-import { GRAY, WHITE, RED } from "../styles/theme";
+import { GRAY, WHITE, RED } from "../../styles/theme.js";
 
 const TABS = ["Overview", "Rankings", "Champion DNA", "Match Predictor", "Win Odds", "Simulator"];
 

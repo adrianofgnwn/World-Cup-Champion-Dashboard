@@ -1,6 +1,6 @@
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from "recharts";
-import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../styles/theme";
-import { CHAMPION, NON_CHAMP, FEATURE_IMPORTANCE } from "../data/teams";
+import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme.js";
+import { CHAMPION, NON_CHAMP, FEATURE_IMPORTANCE } from "../../data/teams.js";
 
 const GOLD = "#d4af37";
 const BLUE = "#4a90d9";
