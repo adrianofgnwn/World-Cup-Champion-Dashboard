@@ -1,6 +1,6 @@
 import { GRAY, WHITE, RED } from "../styles/theme";
 
-const TABS = ["Overview", "Rankings", "Champion DNA", "Simulator"];
+const TABS = ["Overview", "Rankings", "Champion DNA", "Simulator", "Match Predictor"];
 
 export default function Header({ tab, setTab }) {
     return (
