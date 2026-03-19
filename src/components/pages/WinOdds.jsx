@@ -1,7 +1,8 @@
+import useIsMobile from "../../hooks/useIsMobile";
 import { useState, useMemo } from "react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme.js";
-import { TEAMS } from "../../data/teams.js";
+import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme";
+import { TEAMS } from "../../data/teams";
 
 const STAGES = ["R32", "R16", "QF", "SF", "Final", "Winner"];
 const STAGE_KEYS = ["r32", "r16", "qf", "sf", "final", "winner"];
@@ -30,6 +31,7 @@ const TT = ({ active, payload, label }) => {
 
 export default function WinOdds() {
     const [showCount, setShowCount] = useState(8);
+    const mobile = useIsMobile();
 
     // Teams sorted by win probability for this tab
     const simRanked = useMemo(() =>
@@ -59,7 +61,7 @@ export default function WinOdds() {
             </p>
 
             {/* Top 3 hero cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 28 }}>
+            <div className="winodds-hero" style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: mobile ? 10 : 14, marginBottom: 28 }}>
                 {simRanked.slice(0, 3).map((t, i) => (
                     <div key={t.name} style={{
                         background: CARD_BG, borderRadius: 14, padding: "22px 20px",

@@ -1,9 +1,10 @@
+import useIsMobile from "../../hooks/useIsMobile";
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from "recharts";
-import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme.js";
-import { CHAMPION, NON_CHAMP, FEATURE_IMPORTANCE } from "../../data/teams.js";
-
+import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme";
 const GOLD = "#d4af37";
 const BLUE = "#4a90d9";
+import { CHAMPION, NON_CHAMP, FEATURE_IMPORTANCE } from "../../data/teams";
+
 
 const radarData = [
     { key: "shot_conversion", label: "Clinical Finishing", max: 20 },
@@ -69,6 +70,7 @@ function MetricCard({ m }) {
 }
 
 export default function ChampionDNA() {
+    const mobile = useIsMobile();
     const maxImp = FEATURE_IMPORTANCE[0].imp;
 
     return (
@@ -79,7 +81,7 @@ export default function ChampionDNA() {
             </p>
 
             {/* Top section: Radar + Model */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+            <div className="champion-top" style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: mobile ? 14 : 20, marginBottom: mobile ? 20 : 28 }}>
                 <div style={{ background: CARD_BG, borderRadius: 14, padding: 20, border: `1px solid ${CARD_BORDER}`, boxShadow: "0 2px 16px rgba(0,0,0,0.2)" }}>
                     <h3 style={{ fontSize: 14, fontWeight: 700, color: WHITE, marginBottom: 8 }}>The Champion Profile</h3>
                     <ResponsiveContainer width="100%" height={300}>
@@ -129,14 +131,14 @@ export default function ChampionDNA() {
 
             {/* Metric breakdown cards */}
             <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 800, color: WHITE, marginBottom: 14 }}>THE 6 METRICS THAT DEFINE A CHAMPION</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 28 }}>
+            <div className="metric-cards" style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: mobile ? 10 : 12, marginBottom: mobile ? 20 : 28 }}>
                 {metrics.map((m, i) => <MetricCard key={i} m={m} />)}
             </div>
 
             {/* Feature importance */}
             <div style={{ background: CARD_BG, borderRadius: 14, padding: 20, border: `1px solid ${CARD_BORDER}`, boxShadow: "0 2px 16px rgba(0,0,0,0.2)" }}>
                 <h3 style={{ fontSize: 14, fontWeight: 700, color: WHITE, marginBottom: 16 }}>Feature Importance — What the Model Learned</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px" }}>
+                <div className="feature-grid" style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: mobile ? "6px 12px" : "8px 24px" }}>
                     {FEATURE_IMPORTANCE.map((f, i) => (
                         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <span style={{ fontSize: 11, fontWeight: 800, color: i < 3 ? RED : GRAY, width: 18, fontFamily: "'Barlow Condensed', sans-serif", textAlign: "right" }}>#{i + 1}</span>

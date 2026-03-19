@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import useIsMobile from "../../hooks/useIsMobile";
 import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, OFF_WHITE } from "../../styles/theme";
 import { createRNG, simMatch, simGroups, buildR32 } from "../simulator/simulatorUtils";
 import { MW, CX, R32Y, R16Y, QFY, SFY, FY, BW, BH, GOLD, ROUND_LABELS } from "../simulator/simulatorLayout";
@@ -7,6 +8,7 @@ import GroupCard from "../simulator/GroupCard";
 import Connectors from "../simulator/Connectors";
 
 export default function Simulator() {
+    const mobile = useIsMobile();
     const [phase, setPhase] = useState("idle");
     const [mode, setMode] = useState("likely");
     const [groups, setGroups] = useState(null);
@@ -135,70 +137,69 @@ export default function Simulator() {
                     ⚡ RANDOM SIMULATION
                 </button>
                 {phase !== "idle" && (
-                    <span style={{ fontSize: 12, color: GRAY, fontWeight: 600 }}>
-                        {phase === "groups" && "📋 Group stage..."}
-                        {phase === "r32" && "🏟️ Round of 32..."}
-                        {phase === "r16" && "🏟️ Round of 16..."}
-                        {phase === "qf" && "🏟️ Quarter-Finals..."}
-                        {phase === "sf" && "🏟️ Semi-Finals..."}
-                        {phase === "final" && "🏆 The Final..."}
+                    <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: GRAY, fontWeight: 600 }}>
+                        {isRunning && <span className="football-bounce" style={{ fontSize: 18 }}>⚽</span>}
+                        {phase === "groups" && "Group stage..."}
+                        {phase === "r32" && "Round of 32..."}
+                        {phase === "r16" && "Round of 16..."}
+                        {phase === "qf" && "Quarter-Finals..."}
+                        {phase === "sf" && "Semi-Finals..."}
+                        {phase === "final" && "The Final..."}
                         {phase === "done" && (mode === "likely" ? "📊 Based on Elo ratings — the stronger team always wins" : "🎲 Random outcome — click again for a different result")}
                     </span>
                 )}
             </div>
 
-            {/* Winner banner */}
-            {winner && (
-                <div style={{
-                    background: `linear-gradient(135deg, rgba(212,175,55,0.15), rgba(200,16,46,0.1))`,
-                    borderRadius: 14, padding: "20px 28px", marginBottom: 24,
-                    border: `1px solid ${GOLD}44`, textAlign: "center",
-                    boxShadow: `0 4px 32px rgba(212,175,55,0.15)`,
-                }}>
-                    <div style={{ fontSize: 36, marginBottom: 4 }}>🏆</div>
-                    <div style={{ fontSize: 48 }}>{winner.flag}</div>
-                    <div style={{ fontSize: 28, fontWeight: 900, color: GOLD, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2, marginTop: 4 }}>
-                        {winner.name.toUpperCase()}
-                    </div>
-                    <div style={{ fontSize: 13, color: GRAY, marginTop: 4 }}>FIFA World Cup 2026 Champion</div>
+        {/* Winner banner */}
+        {winner && (
+            <div style={{
+                background: `linear-gradient(135deg, rgba(212,175,55,0.15), rgba(200,16,46,0.1))`,
+                borderRadius: 14, padding: "20px 28px", marginBottom: 24,
+                border: `1px solid ${GOLD}44`, textAlign: "center",
+                boxShadow: `0 4px 32px rgba(212,175,55,0.15)`,
+            }}>
+                <div style={{ fontSize: 36, marginBottom: 4 }}>🏆</div>
+                <div style={{ fontSize: 48 }}>{winner.flag}</div>
+                <div style={{ fontSize: 28, fontWeight: 900, color: GOLD, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2, marginTop: 4 }}>
+                    {winner.name.toUpperCase()}
                 </div>
-            )}
+                <div style={{ fontSize: 13, color: GRAY, marginTop: 4 }}>FIFA World Cup 2026 Champion</div>
+            </div>
+        )}
 
-            {/* Knockout bracket */}
-            {phaseIdx >= 2 && (
-                <div style={{ marginBottom: 24 }}>
-                    <h3 style={{ fontSize: 13, fontWeight: 700, color: OFF_WHITE, marginBottom: 10 }}>KNOCKOUT BRACKET</h3>
-                    <div style={{ position: "relative", width: BW, height: 20, marginBottom: 8 }}>
-                        {CX.map((x, i) => (
-                            <div key={i} style={{
-                                position: "absolute", left: x, width: MW,
-                                textAlign: "center", fontSize: 10, fontWeight: 800,
-                                color: i === 4 ? GOLD : GRAY, letterSpacing: 1,
-                            }}>
-                                {ROUND_LABELS[i]}
-                            </div>
-                        ))}
-                    </div>
-                    <div style={{ position: "relative", width: BW, height: BH, overflowX: "auto" }}>
-                        <Connectors phase={phase} />
-
-                        {/* Left bracket: R32 → R16 → QF → SF */}
-                        {R32Y.map((y, i) => <div key={`lr32-${i}`} style={{ position: "absolute", left: CX[0], top: y }}><Slot match={getMatch("r32", i)} /></div>)}
-                        {R16Y.map((y, i) => <div key={`lr16-${i}`} style={{ position: "absolute", left: CX[1], top: y }}><Slot match={getMatch("r16", i)} /></div>)}
-                        {QFY.map((y, i) => <div key={`lqf-${i}`} style={{ position: "absolute", left: CX[2], top: y }}><Slot match={getMatch("qf", i)} /></div>)}
-                        <div style={{ position: "absolute", left: CX[3], top: SFY }}><Slot match={getMatch("sf", 0)} /></div>
-
-                        {/* Final */}
-                        <div style={{ position: "absolute", left: CX[4], top: FY }}><Slot match={getMatch("final", 0)} /></div>
-
-                        {/* Right bracket: SF → QF → R16 → R32 */}
-                        <div style={{ position: "absolute", left: CX[5], top: SFY }}><Slot match={getMatch("sf", 1)} /></div>
-                        {QFY.map((y, i) => <div key={`rqf-${i}`} style={{ position: "absolute", left: CX[6], top: y }}><Slot match={getMatch("qf", i + 2)} /></div>)}
-                        {R16Y.map((y, i) => <div key={`rr16-${i}`} style={{ position: "absolute", left: CX[7], top: y }}><Slot match={getMatch("r16", i + 4)} /></div>)}
-                        {R32Y.map((y, i) => <div key={`rr32-${i}`} style={{ position: "absolute", left: CX[8], top: y }}><Slot match={getMatch("r32", i + 8)} /></div>)}
+        {/* Knockout bracket */}
+        {phaseIdx >= 2 && (
+            <div style={{ marginBottom: 24 }}>
+                <h3 style={{ fontSize: 13, fontWeight: 700, color: OFF_WHITE, marginBottom: 10 }}>KNOCKOUT BRACKET</h3>
+                <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                    <div style={{ minWidth: BW }}>
+                        <div style={{ position: "relative", width: BW, height: 20, marginBottom: 8 }}>
+                            {CX.map((x, i) => (
+                                <div key={i} style={{
+                                    position: "absolute", left: x, width: MW,
+                                    textAlign: "center", fontSize: 10, fontWeight: 800,
+                                    color: i === 4 ? GOLD : GRAY, letterSpacing: 1,
+                                }}>
+                                    {ROUND_LABELS[i]}
+                                </div>
+                            ))}
+                        </div>
+                        <div style={{ position: "relative", width: BW, height: BH }}>
+                            <Connectors phase={phase} />
+                            {R32Y.map((y, i) => <div key={`lr32-${i}`} style={{ position: "absolute", left: CX[0], top: y }}><Slot match={getMatch("r32", i)} /></div>)}
+                            {R16Y.map((y, i) => <div key={`lr16-${i}`} style={{ position: "absolute", left: CX[1], top: y }}><Slot match={getMatch("r16", i)} /></div>)}
+                            {QFY.map((y, i) => <div key={`lqf-${i}`} style={{ position: "absolute", left: CX[2], top: y }}><Slot match={getMatch("qf", i)} /></div>)}
+                            <div style={{ position: "absolute", left: CX[3], top: SFY }}><Slot match={getMatch("sf", 0)} /></div>
+                            <div style={{ position: "absolute", left: CX[4], top: FY }}><Slot match={getMatch("final", 0)} /></div>
+                            <div style={{ position: "absolute", left: CX[5], top: SFY }}><Slot match={getMatch("sf", 1)} /></div>
+                            {QFY.map((y, i) => <div key={`rqf-${i}`} style={{ position: "absolute", left: CX[6], top: y }}><Slot match={getMatch("qf", i + 2)} /></div>)}
+                            {R16Y.map((y, i) => <div key={`rr16-${i}`} style={{ position: "absolute", left: CX[7], top: y }}><Slot match={getMatch("r16", i + 4)} /></div>)}
+                            {R32Y.map((y, i) => <div key={`rr32-${i}`} style={{ position: "absolute", left: CX[8], top: y }}><Slot match={getMatch("r32", i + 8)} /></div>)}
+                        </div>
                     </div>
                 </div>
-            )}
+            </div>
+        )}
 
             {/* Group stage results */}
             {phaseIdx >= 1 && (
@@ -206,7 +207,7 @@ export default function Simulator() {
                     <h3 style={{ fontSize: 13, fontWeight: 700, color: OFF_WHITE, marginBottom: 10 }}>
                         GROUP STAGE {phaseIdx >= 2 && <span style={{ color: GRAY, fontWeight: 500 }}>— 24 teams + 8 best 3rd advance</span>}
                     </h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+                    <div className="grid-2col-mobile" style={{ display: "grid", gridTemplateColumns: mobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 8 }}>
                         {"ABCDEFGHIJKL".split("").map(g => (
                             <GroupCard key={g} g={g} data={groups?.[g]} elim3={elim3} visible={phaseIdx >= 1} />
                         ))}

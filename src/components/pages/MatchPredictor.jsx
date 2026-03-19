@@ -1,10 +1,11 @@
+import useIsMobile from "../../hooks/useIsMobile";
 import { useState, useMemo } from "react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
-import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme.js";
-import { TEAMS, predictMatch } from "../../data/teams.js";
-
+import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../../styles/theme";
 const BLUE = "#4a90d9";
 const GOLD = "#d4af37";
+import { TEAMS, predictMatch } from "../../data/teams";
+
 
 function TeamPicker({ label, selected, onSelect, otherSelected }) {
     const [search, setSearch] = useState("");
@@ -98,6 +99,7 @@ function ProbBar({ label, value, color }) {
 }
 
 export default function MatchPredictor() {
+    const mobile = useIsMobile();
     const [teamA, setTeamA] = useState("Spain");
     const [teamB, setTeamB] = useState("Argentina");
 
@@ -144,9 +146,9 @@ export default function MatchPredictor() {
             </p>
 
             {/* Team pickers */}
-            <div style={{ display: "flex", gap: 20, marginBottom: 28, alignItems: "flex-start" }}>
+            <div className="team-pickers" style={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: mobile ? 12 : 20, marginBottom: mobile ? 20 : 28, alignItems: "flex-start" }}>
                 <TeamPicker label="Home Team" selected={teamA} onSelect={setTeamA} otherSelected={teamB} />
-                <div style={{ display: "flex", alignItems: "center", paddingTop: 28, fontSize: 20, fontWeight: 900, color: GRAY, fontFamily: "'Barlow Condensed', sans-serif" }}>
+                <div className="vs-divider" style={{ display: mobile ? "none" : "flex", alignItems: "center", paddingTop: 28, fontSize: 20, fontWeight: 900, color: GRAY, fontFamily: "'Barlow Condensed', sans-serif" }}>
                     VS
                 </div>
                 <TeamPicker label="Away Team" selected={teamB} onSelect={setTeamB} otherSelected={teamA} />
@@ -196,7 +198,7 @@ export default function MatchPredictor() {
                     </div>
 
                     {/* Head to head comparison */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                    <div className="match-bottom" style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: mobile ? 14 : 20 }}>
                         {/* Stats table */}
                         <div style={{ background: CARD_BG, borderRadius: 14, padding: 20, border: `1px solid ${CARD_BORDER}`, boxShadow: "0 2px 16px rgba(0,0,0,0.2)" }}>
                             <h3 style={{ fontSize: 14, fontWeight: 700, color: WHITE, marginBottom: 16 }}>Head to Head — Stats Comparison</h3>

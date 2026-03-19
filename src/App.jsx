@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { NAVY, GRAY, CARD_BORDER } from "./styles/theme.js";
-import Header from "./components/ui/Header.jsx";
-import CountdownBar from "./components/ui/CountdownBar.jsx";
-import Overview from "./components/pages/Overview.jsx";
-import Rankings from "./components/pages/Rankings.jsx";
-import ChampionDNA from "./components/pages/ChampionDNA.jsx";
-import MatchPredictor from "./components/pages/MatchPredictor.jsx";
-import WinOdds from "./components/pages/WinOdds.jsx";
-import Simulator from "./components/pages/Simulator.jsx";
+import useIsMobile from "./hooks/useIsMobile";
+import { NAVY, GRAY, CARD_BORDER } from "./styles/theme";
+import Header from "./components/ui/Header";
+import CountdownBar from "./components/ui/CountdownBar";
+import Overview from "./components/pages/Overview";
+import Rankings from "./components/pages/Rankings";
+import ChampionDNA from "./components/pages/ChampionDNA";
+import MatchPredictor from "./components/pages/MatchPredictor";
+import WinOdds from "./components/pages/WinOdds";
+import Simulator from "./components/pages/Simulator";
 import "./styles/App.css";
 
 export default function App() {
     const [tab, setTab] = useState("Overview");
+    const mobile = useIsMobile();
 
     return (
         <div className="app" style={{ fontFamily: "'Barlow', sans-serif", background: NAVY, minHeight: "100vh", color: "#e2e5eb", position: "relative", overflow: "hidden" }}>
@@ -30,7 +32,7 @@ export default function App() {
 
             <Header tab={tab} setTab={setTab} />
 
-            <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 24px 48px", position: "relative", zIndex: 1 }}>
+            <div style={{ maxWidth: 1100, margin: "0 auto", padding: mobile ? "16px 12px 32px" : "24px 24px 48px", position: "relative", zIndex: 1 }}>
                 {tab === "Overview" && <Overview />}
                 {tab === "Rankings" && <Rankings />}
                 {tab === "Champion DNA" && <ChampionDNA />}
