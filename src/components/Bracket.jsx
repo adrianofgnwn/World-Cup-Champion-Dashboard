@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { RED, GREEN, WHITE, GRAY, NAVY_MID, NAVY_LIGHT, CARD_BG, CARD_BORDER, OFF_WHITE } from "../styles/theme";
 import { TEAMS, predictMatch } from "../data/teams";
 
@@ -61,60 +61,57 @@ function createRNG(seed) {
     return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
 }
 
-function genGoals(rng) {
-    const r = rng();
-    return r < 0.28 ? 0 : r < 0.55 ? 1 : r < 0.82 ? 2 : r < 0.95 ? 3 : 4;
-}
+function simMatch(a, b, rng, knockout = false, deterministic = false) {
+    if (deterministic) {
+        // Most likely outcome: higher Elo always wins
+        const winner = a.elo >= b.elo ? "A" : "B";
+        return { a, b, winner, pen: false };
+    }
 
-function simMatch(a, b, rng, knockout = false) {
     const p = predictMatch(a.elo, b.elo);
     const roll = rng() * 100;
-    let gA = genGoals(rng), gB = genGoals(rng), pen = false;
 
     if (roll < p.winA) {
-        if (gA <= gB) gA = gB + 1;
+        return { a, b, winner: "A", pen: false };
     } else if (roll < p.winA + p.draw) {
-        gB = gA;
-        if (knockout) pen = true;
+        if (knockout) {
+            const bias = 0.5 + (p.winA / 100 - 0.5) * 0.25;
+            return { a, b, winner: rng() < bias ? "A" : "B", pen: true };
+        }
+        return { a, b, winner: "draw", pen: false };
     } else {
-        if (gB <= gA) gB = gA + 1;
+        return { a, b, winner: "B", pen: false };
     }
-
-    let winner;
-    if (pen) {
-        const bias = 0.5 + (p.winA / 100 - 0.5) * 0.25;
-        winner = rng() < bias ? "A" : "B";
-    } else {
-        winner = gA > gB ? "A" : "B";
-    }
-
-    return { a, b, gA, gB, winner, pen };
 }
 
 // ─── Group stage simulation ───
-function simGroups(rng) {
+function simGroups(rng, deterministic = false) {
     const grouped = {};
     TEAMS.forEach(t => { (grouped[t.group] ||= []).push(t); });
 
     const results = {};
     for (const [g, teams] of Object.entries(grouped)) {
-        const pts = {}, gd = {}, gf = {};
-        teams.forEach(t => { pts[t.name] = 0; gd[t.name] = 0; gf[t.name] = 0; });
-        const matches = [];
-        for (let i = 0; i < teams.length; i++)
-            for (let j = i + 1; j < teams.length; j++) {
-                const m = simMatch(teams[i], teams[j], rng);
-                gf[teams[i].name] += m.gA; gf[teams[j].name] += m.gB;
-                gd[teams[i].name] += m.gA - m.gB; gd[teams[j].name] += m.gB - m.gA;
-                if (m.winner === "A") pts[teams[i].name] += 3;
-                else if (m.winner === "B") pts[teams[j].name] += 3;
-                else { pts[teams[i].name]++; pts[teams[j].name]++; }
-                matches.push(m);
-            }
-        const standings = [...teams].sort((a, b) =>
-            (pts[b.name] - pts[a.name]) || (gd[b.name] - gd[a.name]) || (gf[b.name] - gf[a.name])
-        );
-        results[g] = { standings, pts, gd };
+        if (deterministic) {
+            // Deterministic: rank purely by Elo
+            const standings = [...teams].sort((a, b) => b.elo - a.elo);
+            const pts = {};
+            standings.forEach((t, i) => { pts[t.name] = [9, 6, 3, 0][i]; });
+            results[g] = { standings, pts };
+        } else {
+            const pts = {}, w = {};
+            teams.forEach(t => { pts[t.name] = 0; w[t.name] = 0; });
+            for (let i = 0; i < teams.length; i++)
+                for (let j = i + 1; j < teams.length; j++) {
+                    const m = simMatch(teams[i], teams[j], rng, false, false);
+                    if (m.winner === "A") { pts[teams[i].name] += 3; w[teams[i].name]++; }
+                    else if (m.winner === "B") { pts[teams[j].name] += 3; w[teams[j].name]++; }
+                    else { pts[teams[i].name]++; pts[teams[j].name]++; }
+                }
+            const standings = [...teams].sort((a, b) =>
+                (pts[b.name] - pts[a.name]) || (w[b.name] - w[a.name]) || (b.elo - a.elo)
+            );
+            results[g] = { standings, pts };
+        }
     }
     return results;
 }
@@ -126,10 +123,10 @@ function buildR32(groupResults) {
     for (const [g, { standings }] of Object.entries(groupResults)) {
         pos[`1${g}`] = standings[0];
         pos[`2${g}`] = standings[1];
-        thirds.push({ ...standings[2], fromGroup: g, pts: groupResults[g].pts[standings[2].name], gd: groupResults[g].gd[standings[2].name] });
+        thirds.push({ ...standings[2], fromGroup: g, pts: groupResults[g].pts[standings[2].name] });
     }
     // Best 8 third-place teams
-    thirds.sort((a, b) => (b.pts - a.pts) || (b.gd - a.gd) || (b.elo - a.elo));
+    thirds.sort((a, b) => (b.pts - a.pts) || (b.elo - a.elo));
     const qual3 = thirds.slice(0, 8);
     const elim3 = new Set(thirds.slice(8).map(t => t.name));
 
@@ -161,14 +158,14 @@ function buildR32(groupResults) {
 }
 
 // ─── Match slot component ───
-function Slot({ match, flip }) {
+function Slot({ match }) {
     if (!match) {
         return (
             <div style={{ width: MW, height: MH, background: "rgba(255,255,255,0.02)", borderRadius: 6, border: `1px solid ${NAVY_LIGHT}33` }} />
         );
     }
-    const { a, b, gA, gB, winner, pen } = match;
-    const row = (team, goals, isWinner) => (
+    const { a, b, winner, pen } = match;
+    const row = (team, isWinner) => (
         <div style={{
             display: "flex", alignItems: "center", gap: 4, padding: "0 6px",
             height: MH / 2, fontSize: 11, fontWeight: isWinner ? 800 : 500,
@@ -177,9 +174,9 @@ function Slot({ match, flip }) {
         }}>
             <span style={{ fontSize: 13 }}>{team.flag}</span>
             <span style={{ flex: 1, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 0.5 }}>{CODE[team.name] || team.name.slice(0, 3).toUpperCase()}</span>
-            <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 12 }}>
-                {goals}{pen && isWinner ? " ●" : ""}
-            </span>
+            {isWinner && <span style={{ fontSize: 9, color: pen ? GOLD : GREEN }}>
+                {pen ? "PEN" : "✓"}
+            </span>}
         </div>
     );
     return (
@@ -188,9 +185,9 @@ function Slot({ match, flip }) {
             border: `1px solid ${NAVY_LIGHT}`, overflow: "hidden",
             boxShadow: "0 1px 4px rgba(0,0,0,0.3)",
         }}>
-            {row(a, gA, winner === "A")}
+            {row(a, winner === "A")}
             <div style={{ height: 1, background: NAVY_LIGHT }} />
-            {row(b, gB, winner === "B")}
+            {row(b, winner === "B")}
         </div>
     );
 }
@@ -260,11 +257,8 @@ function GroupCard({ g, data, elim3, visible }) {
                     <div key={t.name} style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 0", fontSize: 11, color: isElim ? "#4a5568" : i < 2 ? WHITE : color3 || GRAY }}>
                         <span style={{ fontSize: 12 }}>{t.flag}</span>
                         <span style={{ flex: 1, fontWeight: i < 2 ? 700 : 500 }}>{CODE[t.name] || t.name.slice(0, 3)}</span>
-                        <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, width: 16, textAlign: "right" }}>{data.pts[t.name]}</span>
-                        <span style={{ fontSize: 10, width: 24, textAlign: "right", color: isElim ? "#4a5568" : GRAY }}>{data.gd[t.name] > 0 ? "+" : ""}{data.gd[t.name]}</span>
-                        <span style={{ fontSize: 9, width: 10, textAlign: "center" }}>
-                            {isElim ? "" : i < 2 ? "✓" : "✓"}
-                        </span>
+                        <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, width: 20, textAlign: "right" }}>{data.pts[t.name]}</span>
+                        <span style={{ fontSize: 9, color: GRAY, width: 16, textAlign: "center" }}>pts</span>
                     </div>
                 );
             })}
@@ -275,6 +269,7 @@ function GroupCard({ g, data, elim3, visible }) {
 // ─── Main Bracket component ───
 export default function Bracket() {
     const [phase, setPhase] = useState("idle");
+    const [mode, setMode] = useState("likely"); // "likely" or "random"
     const [groups, setGroups] = useState(null);
     const [r32Data, setR32Data] = useState(null);
     const [elim3, setElim3] = useState(null);
@@ -286,68 +281,63 @@ export default function Bracket() {
     const clearTimers = () => { timers.current.forEach(clearTimeout); timers.current = []; };
     const delay = (fn, ms) => { timers.current.push(setTimeout(fn, ms)); };
 
-    const simulate = useCallback(() => {
+    const runBracket = useCallback((deterministic) => {
         clearTimers();
         const seed = Date.now() + simCount;
         setSimCount(c => c + 1);
+        setMode(deterministic ? "likely" : "random");
         setPhase("idle"); setGroups(null); setR32Data(null); setElim3(null); setWinner(null);
         setMatches({ r32: [], r16: [], qf: [], sf: [], final: null });
 
         const rng = createRNG(seed);
 
         delay(() => {
-            // Group stage
-            const gr = simGroups(rng);
+            const gr = simGroups(rng, deterministic);
             setGroups(gr);
             setPhase("groups");
 
             delay(() => {
-                // Build & simulate R32
                 const { left, right, elim3: e3 } = buildR32(gr);
                 setElim3(e3);
-                const r32 = [...left, ...right].map(([a, b]) => simMatch(a, b, rng, true));
+                const r32 = [...left, ...right].map(([a, b]) => simMatch(a, b, rng, true, deterministic));
                 setMatches(m => ({ ...m, r32 }));
                 setR32Data({ left, right });
                 setPhase("r32");
 
                 delay(() => {
-                    // R16
                     const r16 = [];
                     for (let i = 0; i < 8; i++) {
                         const w1 = r32[i * 2].winner === "A" ? r32[i * 2].a : r32[i * 2].b;
                         const w2 = r32[i * 2 + 1].winner === "A" ? r32[i * 2 + 1].a : r32[i * 2 + 1].b;
-                        r16.push(simMatch(w1, w2, rng, true));
+                        r16.push(simMatch(w1, w2, rng, true, deterministic));
                     }
                     setMatches(m => ({ ...m, r16 }));
                     setPhase("r16");
 
                     delay(() => {
-                        // QF
                         const qf = [];
                         for (let i = 0; i < 4; i++) {
                             const w1 = r16[i * 2].winner === "A" ? r16[i * 2].a : r16[i * 2].b;
                             const w2 = r16[i * 2 + 1].winner === "A" ? r16[i * 2 + 1].a : r16[i * 2 + 1].b;
-                            qf.push(simMatch(w1, w2, rng, true));
+                            qf.push(simMatch(w1, w2, rng, true, deterministic));
                         }
                         setMatches(m => ({ ...m, qf }));
                         setPhase("qf");
 
                         delay(() => {
-                            // SF
                             const sf = [];
                             for (let i = 0; i < 2; i++) {
                                 const w1 = qf[i * 2].winner === "A" ? qf[i * 2].a : qf[i * 2].b;
                                 const w2 = qf[i * 2 + 1].winner === "A" ? qf[i * 2 + 1].a : qf[i * 2 + 1].b;
-                                sf.push(simMatch(w1, w2, rng, true));
+                                sf.push(simMatch(w1, w2, rng, true, deterministic));
                             }
                             setMatches(m => ({ ...m, sf }));
                             setPhase("sf");
 
                             delay(() => {
-                                // Final
                                 const w1 = sf[0].winner === "A" ? sf[0].a : sf[0].b;
                                 const w2 = sf[1].winner === "A" ? sf[1].a : sf[1].b;
-                                const f = simMatch(w1, w2, rng, true);
+                                const f = simMatch(w1, w2, rng, true, deterministic);
                                 setMatches(m => ({ ...m, final: f }));
                                 setPhase("final");
 
@@ -389,16 +379,28 @@ export default function Bracket() {
                 Simulate a complete World Cup 2026 tournament. Each match uses Elo-based probabilities with randomized outcomes.
             </p>
 
-            {/* Simulate button */}
+            {/* Mode buttons */}
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-                <button onClick={simulate} disabled={isRunning} style={{
-                    padding: "10px 28px", borderRadius: 8, fontSize: 14, fontWeight: 800,
+                <button onClick={() => runBracket(true)} disabled={isRunning} style={{
+                    padding: "10px 24px", borderRadius: 8, fontSize: 13, fontWeight: 800,
+                    cursor: isRunning ? "not-allowed" : "pointer",
+                    background: isRunning ? NAVY_LIGHT : mode === "likely" && phase === "done" ? NAVY_MID : RED,
+                    color: WHITE,
+                    fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 1,
+                    opacity: isRunning ? 0.6 : 1, transition: "all 0.2s",
+                    border: mode === "likely" && phase === "done" ? `1px solid ${RED}` : "1px solid transparent",
+                }}>
+                    🏆 MOST LIKELY OUTCOME
+                </button>
+                <button onClick={() => runBracket(false)} disabled={isRunning} style={{
+                    padding: "10px 24px", borderRadius: 8, fontSize: 13, fontWeight: 800,
                     cursor: isRunning ? "not-allowed" : "pointer", border: "none",
-                    background: isRunning ? NAVY_LIGHT : RED, color: WHITE,
+                    background: isRunning ? NAVY_LIGHT : "rgba(255,255,255,0.06)",
+                    color: isRunning ? GRAY : WHITE,
                     fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 1,
                     opacity: isRunning ? 0.6 : 1, transition: "all 0.2s",
                 }}>
-                    {phase === "idle" ? "⚡ SIMULATE TOURNAMENT" : isRunning ? "SIMULATING..." : "⚡ RE-SIMULATE"}
+                    ⚡ RANDOM SIMULATION
                 </button>
                 {phase !== "idle" && (
                     <span style={{ fontSize: 12, color: GRAY, fontWeight: 600 }}>
@@ -408,7 +410,7 @@ export default function Bracket() {
                         {phase === "qf" && "🏟️ Quarter-Finals..."}
                         {phase === "sf" && "🏟️ Semi-Finals..."}
                         {phase === "final" && "🏆 The Final..."}
-                        {phase === "done" && "✅ Tournament complete"}
+                        {phase === "done" && (mode === "likely" ? "📊 Based on Elo ratings — the stronger team always wins" : "🎲 Random outcome — click again for a different result")}
                     </span>
                 )}
             </div>
@@ -430,37 +432,11 @@ export default function Bracket() {
                 </div>
             )}
 
-            {/* Group stage results */}
-            {phaseIdx >= 1 && (
-                <div style={{ marginBottom: 24 }}>
-                    <h3 style={{ fontSize: 13, fontWeight: 700, color: OFF_WHITE, marginBottom: 10 }}>
-                        GROUP STAGE {phaseIdx >= 2 && <span style={{ color: GRAY, fontWeight: 500 }}>— 24 teams + 8 best 3rd advance</span>}
-                    </h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
-                        {"ABCDEFGHIJKL".split("").map(g => (
-                            <GroupCard key={g} g={g} data={groups?.[g]} elim3={elim3} visible={phaseIdx >= 1} />
-                        ))}
-                    </div>
-                </div>
-            )}
-
             {/* Bracket */}
             {phaseIdx >= 2 && (
                 <div style={{ marginBottom: 24 }}>
                     <h3 style={{ fontSize: 13, fontWeight: 700, color: OFF_WHITE, marginBottom: 10 }}>KNOCKOUT BRACKET</h3>
 
-                    {/* Round labels */}
-                    <div style={{ display: "flex", width: BW, marginBottom: 6 }}>
-                        {CX.map((x, i) => (
-                            <div key={i} style={{
-                                position: "relative", left: x, width: MW,
-                                textAlign: "center", fontSize: 10, fontWeight: 800,
-                                color: i === 4 ? GOLD : GRAY, letterSpacing: 1,
-                                position: "absolute",
-                            }}>
-                            </div>
-                        ))}
-                    </div>
                     {/* Round labels bar */}
                     <div style={{ position: "relative", width: BW, height: 20, marginBottom: 8 }}>
                         {CX.map((x, i) => (
@@ -530,13 +506,26 @@ export default function Bracket() {
                 </div>
             )}
 
+            {/* Group stage results */}
+            {phaseIdx >= 1 && (
+                <div style={{ marginBottom: 24 }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, color: OFF_WHITE, marginBottom: 10 }}>
+                        GROUP STAGE {phaseIdx >= 2 && <span style={{ color: GRAY, fontWeight: 500 }}>— 24 teams + 8 best 3rd advance</span>}
+                    </h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+                        {"ABCDEFGHIJKL".split("").map(g => (
+                            <GroupCard key={g} g={g} data={groups?.[g]} elim3={elim3} visible={phaseIdx >= 1} />
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Methodology note */}
             <div style={{ background: NAVY_MID, borderRadius: 10, padding: "12px 16px", fontSize: 11, color: GRAY, lineHeight: 1.5, marginTop: 8 }}>
-                <strong style={{ color: OFF_WHITE }}>How it works:</strong> Group stage plays full round-robin (6 matches/group).
-                Top 2 from each group + 8 best 3rd-place teams advance to a 32-team single-elimination bracket.
-                Each match outcome is probabilistic based on Elo difference.
-                Draws in knockout rounds go to penalties (compressed toward 50/50). Click Re-Simulate for a different outcome.
-                <span style={{ color: GRAY }}> ● = penalty shootout winner</span>
+                <strong style={{ color: OFF_WHITE }}>How it works:</strong> <strong style={{ color: RED }}>Most Likely</strong> shows the predicted outcome where the higher-Elo team always wins — this is what the model says should happen.
+                <strong style={{ color: OFF_WHITE }}> Random Simulation</strong> introduces probabilistic outcomes using the Elo formula — upsets can happen, just like in real football.
+                Group stage plays round-robin, top 2 + best 8 third-place teams advance to a 32-team bracket.
+                <span style={{ color: GREEN }}> ✓ = win</span> <span style={{ color: GOLD, marginLeft: 8 }}> PEN = penalty shootout</span>
             </div>
         </>
     );
