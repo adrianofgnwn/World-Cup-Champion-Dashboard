@@ -5,7 +5,7 @@ import { CHAMPION, TEAMS } from "../data/teams";
 import TeamRow from "./TeamRow";
 
 export default function Rankings() {
-    const [selectedTeam, setSelectedTeam] = useState("Argentina");
+    const [selectedTeam, setSelectedTeam] = useState("Spain");
     const team = TEAMS.find(t => t.name === selectedTeam) || TEAMS[0];
 
     const radarData = useMemo(() => {
@@ -28,7 +28,7 @@ export default function Rankings() {
         <>
             <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: WHITE, marginBottom: 4 }}>2026 CONTENDER RANKINGS</h2>
             <p style={{ color: GRAY, fontSize: 13, marginBottom: 20 }}>
-                Each team scored 0–100 based on how closely their recent stats match the World Cup champion DNA. Click a team for their radar profile.
+                All 48 qualified teams ranked by FIFA Elo rating. Click a team to compare their profile against the World Cup champion DNA.
             </p>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
@@ -43,7 +43,9 @@ export default function Rankings() {
                         <span style={{ fontSize: 40 }}>{team.flag}</span>
                         <div>
                             <div style={{ fontSize: 22, fontWeight: 900, color: WHITE, fontFamily: "'Barlow Condensed', sans-serif" }}>{team.name}</div>
-                            <div style={{ fontSize: 12, color: GRAY }}>{team.matches} matches · {team.conf} · Score: <strong style={{ color: RED, fontSize: 16 }}>{team.score}</strong></div>
+                            <div style={{ fontSize: 12, color: GRAY }}>
+                                Group {team.group} · {team.conf} · {team.matches} matches · Elo: <strong style={{ color: RED, fontSize: 16 }}>{team.elo}</strong>
+                            </div>
                         </div>
                     </div>
 
@@ -63,7 +65,7 @@ export default function Rankings() {
                             { l: "Shot Conv.", v: `${team.shotConv}%`, b: `${CHAMPION.shot_conversion}%`, ok: team.shotConv >= CHAMPION.shot_conversion * 0.9 },
                             { l: "Def. Save", v: `${team.defSave}%`, b: `${CHAMPION.defensive_save_rate}%`, ok: team.defSave >= CHAMPION.defensive_save_rate * 0.98 },
                             { l: "xG Overperf.", v: `${team.xgOver > 0 ? "+" : ""}${team.xgOver}`, b: `+${CHAMPION.xg_overperformance}`, ok: team.xgOver >= 0 },
-                            { l: "Goal Diff", v: `+${team.goalDiff}`, b: `+${CHAMPION.goal_difference}`, ok: team.goalDiff >= 1.0 },
+                            { l: "Goal Diff", v: `${team.goalDiff >= 0 ? "+" : ""}${team.goalDiff}`, b: `+${CHAMPION.goal_difference}`, ok: team.goalDiff >= 1.0 },
                         ].map((s, i) => (
                             <div key={i} style={{ background: NAVY_MID, borderRadius: 10, padding: "10px 12px", borderLeft: `3px solid ${s.ok ? GREEN : RED}` }}>
                                 <div style={{ fontSize: 10, color: GRAY, textTransform: "uppercase", letterSpacing: 1, fontWeight: 700 }}>{s.l}</div>
