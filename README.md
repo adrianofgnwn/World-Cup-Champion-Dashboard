@@ -6,7 +6,7 @@ Companion to the [ML prediction pipeline](https://github.com/adrianofgnwn/World-
 
 ## Live Demo
 
-🔗 **[View Dashboard →](https://world-cup-champion-dashboard.vercel.app)**
+🔗 **[View Dashboard →](https://wc26-predictor.vercel.app)**
 
 ## Key Finding
 
@@ -52,6 +52,7 @@ src/
 │   │   └── Connectors.jsx       # SVG bracket connector lines
 │   └── ui/                      # Shared/reusable components
 │       ├── Header.jsx
+│       ├── CountdownBar.jsx     # Live countdown to WC26 kickoff
 │       ├── StatCard.jsx
 │       └── TeamRow.jsx
 ├── data/
@@ -78,6 +79,7 @@ All data is pre-computed by the ML pipeline and embedded in `teams.js`:
 - **Typography:** Barlow + Barlow Condensed
 - **Effects:** Floating animated orbs, glass-morphism cards
 - **Charts:** Recharts (radar, area, bar)
+- **Countdown:** Live ticker to WC26 kickoff (June 11, 2026, 3PM ET)
 
 ## Getting Started
 
@@ -88,19 +90,9 @@ npm install
 npm run dev
 ```
 
-## Deployment
-
-```bash
-npm i -g vercel
-vercel
-```
-
 ## Tech Stack
 
-- React 18 + Vite
-- Recharts for data visualization
-- CSS-in-JS with theme tokens
-- Deployed on Vercel
+React 18 · Vite · Recharts · Vercel
 
 ## Author
 
